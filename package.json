@@ -1,0 +1,26 @@
+{
+  "name": "node-serve",
+  "version": "1.0.0",
+  "description": "apply to vue-element-admin",
+  "main": "serve.js",
+  "bin": "koa.js",
+  "scripts": {
+    "start": "node koa.js",
+    "pkg": "pkg koa.js"
+  },
+  "author": "iDark",
+  "license": "ISC",
+  "dependencies": {
+    "jsonwebtoken": "^8.5.1",
+    "koa": "^2.13.1",
+    "koa-bodyparser": "^4.3.0",
+    "koa-cors": "^0.0.16",
+    "koa-logger": "^3.2.1",
+    "koa-router": "^10.0.0",
+    "moment": "^2.29.1",
+    "mysql": "^2.18.1"
+  },
+  "devDependencies": {
+    "pkg": "^4.4.9"
+  }
+}
