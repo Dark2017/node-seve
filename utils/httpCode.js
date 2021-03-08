@@ -8,17 +8,17 @@ module.exports = class httpCode {
 
     }
     success(data) {
-        return {
+        return JSON.stringify({
             code: 0,
             data,
             msg: "success"
-        }
+        })
     }
     fail(data) {
-        return {
+        return JSON.stringify({
             code: -1,
             data,
             msg: "fail"
-        }
+        })
     }
 }
