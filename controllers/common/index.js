@@ -1,52 +1,46 @@
 const httpCode = require('../../utils/httpCode');
-const codeObj = new httpCode();
-const query = require('../../db')
-const jwt = require('jsonwebtoken')
-const serve_key = 'iDark'
+const code_body = new httpCode();
+const query = require('../../db');
+const jwt = require('jsonwebtoken');
+const path = require('path');
+const serve_key = 'iDark';
 module.exports = {
     // 用户登录
     async login(ctx) {
         let { username, password } = ctx.request.body
-        let created = Math.floor(Date.now() / 1000);
-        console.log(ctx,'--cts-');
         const res = await query(`select * from account where username='${username}' and password='${password}'`, '')
-        const token = jwt.sign({ 
-            data: ctx.request.body,
-            // exp: created + 60 * 30,
-            expiresIn: 30,
-            iat: created
-        }, serve_key)
+        const token = jwt.sign(ctx.request.body, serve_key, { expiresIn: '1h'})
         ctx.status = 200
         if(res.length == 0) {
-            ctx.body = codeObj.fail({
+            ctx.body = code_body.fail({
                 msg: '账号或密码错误！'
             })
         } else {
-            ctx.body = codeObj.success({
+            ctx.body = code_body.success({
                 token,
                 msg: '登录成功！'
             })
         }
     },
-     // 注册账户
+    // 注册账户
     async register(ctx) {
         let { username, password } = ctx.request.body
         const res = await query(`select * from account where username='${username}'`, '')
         ctx.status = 200
         if(res.length > 0) {
-            ctx.body = codeObj.fail({
+            ctx.body = code_body.fail({
                 msg: '账号已存在！'
             })
         } else {
             if(!password) {
-                ctx.body = codeObj.fail({
+                ctx.body = code_body.fail({
                     msg: '请填写密码！'
                 })
                 return
             }
             const data = await query(`insert into account set username=?, password=?`, [username, password])
             if(data) {
-                ctx.body = codeObj.success({
+                ctx.body = code_body.success({
                     msg: '注册成功！'
                 })
             }
@@ -54,15 +48,13 @@ module.exports = {
     },
     // post测试
     test(ctx) {
-        console.log(ctx.request.body,'-ctx-');
-        ctx.body = codeObj.success('this is a post request and result is: '
+        ctx.body = code_body.success('this is a post request and result is: '
                 + ctx.request.body.value + '123456')
-        
     },
     // get测试
     test1(ctx) {
         console.log(ctx.request.query,'-ctx-');
-        ctx.body = codeObj.success('this is a get request and result is: '
+        ctx.body = code_body.success('this is a get request and result is: '
                 + ctx.request.query.value + '123456'
             )
     },
@@ -73,11 +65,11 @@ module.exports = {
         if(authorization) {
             jwt.verify(authorization, serve_key, (err, decoded) => {
                 if(err) {
-                    ctx.body = codeObj.fail({
+                    ctx.body = code_body.fail({
                         msg: 'token验证失败！'
                     })
                 } else {
-                    ctx.body = codeObj.success({
+                    ctx.body = code_body.success({
                         msg: 'token验证成功！',
                         data: decoded
                     })
@@ -85,17 +77,16 @@ module.exports = {
             })
             return
         }
-        ctx.body = codeObj.fail({
+        ctx.body = code_body.fail({
             msg: 'token为空！'
         })
     },
     // 文件上传测试
     async upload(ctx) {
         const { file } = ctx.request.files
-        const { path, name, type} = file
-        ctx.body = codeObj.success({
-            url: `${ctx.origin}/${file.path}` ,
-            path, name, type
+        let basename = path.basename(file.path)
+        ctx.body = code_body.success({
+            url: `${ctx.origin}/${basename}` 
         })
     }
 }

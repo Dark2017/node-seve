@@ -7,8 +7,8 @@ const koa = require('koa')
 const bodyParser = require('koa-body');
 const route = require('./route')
 const cors = require('koa-cors')
-const logger = require('koa-logger')
-const schedule = require('./schedule')
+const { accessLogger, logger } = require('./middleware/logger');
+const schedule = require('./middleware/schedule')
 const moment = require('moment')
 const static = require('koa-static')
 const path = require('path')
@@ -21,13 +21,12 @@ app.use(static(path.join(__dirname, 'public')))
 // 处理post/图片等 
 app.use(bodyParser({
     multipart: true,
-    formidable:{
-        uploadDir:'public', // 设置文件上传目录
+    formidable: {
+        uploadDir: path.join(__dirname, 'public'), // 设置文件上传目录
         keepExtensions: true,    // 保持文件的后缀
-        maxFieldsSize:2 * 1024 * 1024, // 文件上传大小
+        maxFieldsSize: 2 * 1024 * 1024, // 文件上传大小
         onFileBegin: (type, file) => {
             const name = `${moment().format('YYYY-MM-DD')}_${file.name}`
-            console.log(file,'--file--');
             file.name = name
             file.path = `public/${name}`
         }
@@ -37,7 +36,7 @@ app.use(bodyParser({
     }
 }));
 // 日志
-app.use(logger())
+app.use(accessLogger())
 // 注册路由
 app.use(route.routes(), route.allowedMethods())
 // 定时任务
@@ -49,5 +48,5 @@ app.listen(port, () => {
 })
 // 错误日志
 app.on('error', err => {
-    console.log('server error', err);
+    logger.error(err)
 })

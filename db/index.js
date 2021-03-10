@@ -1,4 +1,4 @@
-var mysql      = require('mysql');
+var mysql = require('mysql');
 var pool = mysql.createPool({
   host     : 'localhost',
   user     : 'root',
@@ -6,9 +6,9 @@ var pool = mysql.createPool({
   database : 'idark'
 });
 /**
-* @param  sql [查询语句] 传入参数
+* @param  sql [sql语句] 传入参数
 * @param  values [值，非必填] 传入参数
-* @return Promise [查询结果] 返回值
+* @return Promise [结果] 返回值
 */
 let query = (sql, values) => {
     return new Promise(( resolve, reject) => {
