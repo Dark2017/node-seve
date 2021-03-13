@@ -1,9 +1,9 @@
 var mysql = require('mysql');
 var pool = mysql.createPool({
-  host     : 'localhost',
-  user     : 'root',
-  password : '123456',
-  database : 'idark'
+  host     : '你的ip',
+  user     : '你的账号',
+  password : '你的密码',
+  database : '你的db'
 });
 /**
 * @param  sql [sql语句] 传入参数
