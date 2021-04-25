@@ -4,6 +4,18 @@ const query = require('../../db');
 const jwt = require('jsonwebtoken');
 const path = require('path');
 const serve_key = 'iDark';
+function jwt_verify(token) {
+    return new Promise(( resolve, reject) => {
+        jwt.verify(token, serve_key, (err, decoded) => {
+            if(err) {
+                reject(err)
+            } else {
+                resolve(decoded)
+            }
+        })
+    })
+
+}
 module.exports = {
     // 用户登录
     async login(ctx) {
@@ -22,10 +34,13 @@ module.exports = {
             })
         }
     },
-    // 注册账户
+    /**
+    * 注册账号
+    * @param auth: 权限 1：超级管理员； 2：普通用户
+    */
     async register(ctx) {
-        let { username, password } = ctx.request.body
-        const res = await query(`select * from account where username='${username}'`, '')
+        let { username, password, auth } = ctx.request.body
+        const res = await query(`select * from account where username='${username}'`,'')
         ctx.status = 200
         if(res.length > 0) {
             ctx.body = code_body.fail({
@@ -38,13 +53,47 @@ module.exports = {
                 })
                 return
             }
-            const data = await query(`insert into account set username=?, password=?`, [username, password])
+            if(!auth) {
+                ctx.body = code_body.fail({
+                    msg: '请选择权限！'
+                })
+                return
+            }
+            const data = await query(`insert into account set username=?, password=?, auth=?`, [username, password, auth])
             if(data) {
                 ctx.body = code_body.success({
                     msg: '注册成功！'
                 })
             }
         }
+    },
+    // 删除账号
+    async delete_account(ctx) {
+        let { username } = ctx.request.body
+        let { authorization } = ctx.header
+        const user_jwt = await jwt_verify(authorization)
+        if(user_jwt.username === username) {
+            ctx.body = code_body.fail({
+                msg: '无法删除自己！'
+            })
+            return
+        }
+
+        const res = await query(`delete from account where username='${username}'`,'')
+        ctx.status = 200
+        if(res.length > 0) {
+            ctx.body = code_body.fail({
+                msg: '删除失败！'
+            })
+        } else {
+            ctx.body = code_body.success({
+                msg: '删除成功！'
+            })
+        }
+        ctx.body = code_body.fail({
+            msg: error
+        })
+
     },
     // post测试
     test(ctx) {
@@ -66,7 +115,8 @@ module.exports = {
             jwt.verify(authorization, serve_key, (err, decoded) => {
                 if(err) {
                     ctx.body = code_body.fail({
-                        msg: 'token验证失败！'
+                        msg: 'token验证失败！',
+                        data: err
                     })
                 } else {
                     ctx.body = code_body.success({

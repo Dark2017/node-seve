@@ -13,5 +13,6 @@ routes
     .get('/test1', userctrl.test1)
     .get('/verifyToken', userctrl.verifyToken)
     .post('/upload', userctrl.upload)
+    .post('/delete_account', userctrl.delete_account)
 
 module.exports = routes

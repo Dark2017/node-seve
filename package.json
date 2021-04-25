@@ -6,7 +6,8 @@
   "bin": "koa.js",
   "scripts": {
     "start": "node koa.js",
-    "pkg": "pkg koa.js"
+    "hot": "nodemon koa.js",
+    "pkg": "pkg -t win koa.js"
   },
   "author": "iDark",
   "license": "ISC",
@@ -23,6 +24,7 @@
     "node-schedule": "^2.0.0"
   },
   "devDependencies": {
+    "nodemon": "^2.0.7",
     "pkg": "^4.4.9"
   }
 }

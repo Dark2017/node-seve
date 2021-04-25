@@ -44,7 +44,7 @@ schedule.scheduleCronstyle()
 // 监听端口
 var port = 3000
 app.listen(port, () => {
-    console.log(`the serve is on ${port}`);
+    console.log(`服务已经运行在端口： ${port}`);
 })
 // 错误日志
 app.on('error', err => {
